@@ -76,3 +76,117 @@ WHERE album_id IN (
 		SELECT artist_id FROM artist
 		WHERE name = 'Queen'
 ));
+
+-- Practice updating Rows
+-- 1
+UPDATE customer
+SET fax = null
+WHERE fax IS NOT null;
+-- 2
+UPDATE customer
+SET company = 'Self'
+WHERE company IS null;
+-- 3
+UPDATE customer
+SET last_name = 'Thompson'
+WHERE first_name = 'Julia' and last_name = 'Barnett';
+-- 4
+UPDATE customer
+SET support_rep_id = 4
+WHERE email = 'luisrojas@yahoo.cl';
+-- 5
+UPDATE track
+SET composer = 'The darkness around us'
+WHERE composer IS NULL 
+AND genre_id = (
+	SELECT genre_id FROM genre
+	WHERE name = 'Metal';
+);
+
+-- Group by
+-- 1
+SELECT COUNT(*), g.name FROM track t
+JOIN genre g ON t.genre_id = g.genre_id
+GROUP BY g.name;
+-- 2
+SELECT COUNT(*), g.name FROM track t
+JOIN genre g ON t.genre_id = g.genre_id
+WHERE g.name = 'Pop' OR g.name = 'Rock'
+GROUP BY g.name;
+-- 3
+SELECT COUNT(*), ar.name FROM album al
+JOIN artist ar ON ar.artist_id = al.artist_id
+GROUP BY ar.name;
+
+-- Use Distinct Rows
+
+-- 1
+SELECT DISTINCT composer
+FROM track;
+-- 2
+SELECT DISTINCT billing_postal_code
+FROM invoice;
+-- 3
+SELECT DISTINCT company
+FROM customer;
+
+-- Delete Rows
+
+-- 1
+DELETE FROM practice_delete WHERE type = 'bronze';
+-- 2
+DELETE FROM practice_delete WHERE type = 'silver';
+-- 3
+DELETE FROM practice_delete WHERE value = 150;
+
+-- eCommerce Simulation
+-- I didn't totally understand the instructions for this part. I created some tables and practiced working with them. I'm thinking of building a basic eCommerce site for my personal project. I was using this as practice as well to see how the database would be set up. Would love your opinion on how to set up a basic database for an eCommerce site sometime. Wasn't sure how to group tables, but this is what I came up with.
+
+CREATE TABLE users (
+	user_id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  email VARCHAR(100)
+);
+
+CREATE TABLE product (
+	product_id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  price DECIMAL
+);
+
+CREATE TABLE orders (
+	order_id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(user_id)
+);
+
+CREATE TABLE order_item (
+	order_item_id SERIAL PRIMARY KEY,
+  order_id INTEGER REFERENCES orders(order_id),
+  product_id INTEGER REFERENCES product(product_id),
+  quantity INTEGER
+);
+
+INSERT INTO users (name, email)
+VALUES ('Justin', 'justin@justin.com'),
+	('Dayne', 'dayne@dayne.com'),
+    ('Samantha', 'sam@sam.com');
+
+INSERT INTO product (name, price)
+VALUES ('Broom', 15.50), ('Garbage Can', 10), ('Cup', 4.99);
+
+INSERT INTO order_item (product_id, quantity, order_id)
+VALUES (1, 2, 1), (2, 1, 1), (3, 1, 2);
+
+SELECT u.name, o.order_id, p.name, oi.quantity FROM order_item oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN users u ON o.user_id = u.user_id
+JOIN product p ON p.product_id = oi.product_id;
+
+SELECT o.order_id, u.name, p.name, oi.quantity FROM order_item oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN users u ON o.user_id = u.user_id
+JOIN product p ON p.product_id = oi.product_id
+WHERE o.order_id = 1;
+
+
+
